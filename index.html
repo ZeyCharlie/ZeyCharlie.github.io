@@ -64,6 +64,32 @@
         margin: 0 auto;
         padding: 0 24px;
       }
+      .view-counter {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        z-index: 99;
+        background: var(--accent-soft);
+        color: var(--accent);
+        text-align: center;
+        padding: 8px 16px;
+        font-size: 13px;
+        font-weight: 500;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+      }
+      .view-counter .stat {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .view-counter span {
+        font-weight: 700;
+        margin: 0 2px;
+      }
       nav {
         position: fixed;
         top: 0;
@@ -101,7 +127,7 @@
         opacity: 1;
       }
       .hero {
-        padding: 140px 0 80px;
+        padding: 172px 0 80px;
       }
       .hero .badge {
         display: inline-block;
@@ -336,6 +362,10 @@
     </style>
   </head>
   <body>
+    <div class="view-counter">
+      <div class="stat">今日访客：<span id="today-visitors">--</span></div>
+      <div class="stat">总浏览量：<span id="view-count">--</span></div>
+    </div>
     <nav>
       <div class="container">
         <a href="#" class="logo">ZeyCharlie</a>
@@ -475,6 +505,35 @@
       </div>
     </footer>
     <script>
+      // Page view counter using countapi.xyz
+      const counterNs = 'zeycharlie';
+      const totalKey = 'homepage-views';
+      
+      // Get today's date for daily counter
+      const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+      const dailyKey = `visitors-${today}`;
+      
+      // Increment and fetch total views
+      fetch(`https://api.countapi.xyz/hit/${counterNs}/${totalKey}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('view-count').textContent = data.value.toLocaleString();
+        })
+        .catch(() => {
+          document.getElementById('view-count').textContent = '0';
+        });
+      
+      // Increment and fetch today's visitors
+      fetch(`https://api.countapi.xyz/hit/${counterNs}/${dailyKey}`)
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('today-visitors').textContent = data.value.toLocaleString();
+        })
+        .catch(() => {
+          document.getElementById('today-visitors').textContent = '0';
+        });
+
+      // Intersection Observer for scroll animations
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
